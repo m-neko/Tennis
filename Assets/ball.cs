@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 
 public class ball : MonoBehaviour
@@ -33,6 +31,10 @@ public class ball : MonoBehaviour
         // ゲームクリア画面でエンターキーを押したら再プレイ
         if(clear && Input.GetKey(KeyCode.Return)){
             GameInitialize();
+        }
+        // ESCで終了
+        if(Input.GetKeyDown(KeyCode.Escape)){
+            Application.Quit();
         }
     }
 
