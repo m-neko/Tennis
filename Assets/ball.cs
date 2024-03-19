@@ -7,6 +7,8 @@ public class ball : MonoBehaviour
     private int scoreB = 0;
     private bool clear = false;
 
+    private float speed = 0.3f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -22,7 +24,7 @@ public class ball : MonoBehaviour
         GameObject.Find("ScoreA").GetComponent<UnityEngine.UI.Text>().text = scoreA.ToString();
         GameObject.Find("ScoreB").GetComponent<UnityEngine.UI.Text>().text = scoreB.ToString();
         GetComponent<Renderer>().enabled = true;
-        GetComponent<Rigidbody2D>().velocity = new Vector2(-10, 10);
+        GetComponent<Rigidbody2D>().velocity = new Vector2(-10*speed, 10*speed);
     }
 
     // Update is called once per frame
@@ -70,13 +72,13 @@ public class ball : MonoBehaviour
         transform.position = new Vector3(0, 4, 0);
        if(name == "GoalLeft")
         {
-            GetComponent<Rigidbody2D>().velocity = new Vector2(10, 10);
+            GetComponent<Rigidbody2D>().velocity = new Vector2(10*speed, 10*speed);
             scoreB += 10;
             GameObject.Find("ScoreB").GetComponent<UnityEngine.UI.Text>().text = scoreB.ToString();
         }
         else if(name == "GoalRight")
         {
-            GetComponent<Rigidbody2D>().velocity = new Vector2(-10, 10);
+            GetComponent<Rigidbody2D>().velocity = new Vector2(-10*speed, 10*speed);
             scoreA += 10;
             GameObject.Find("ScoreA").GetComponent<UnityEngine.UI.Text>().text = scoreA.ToString();
         }
