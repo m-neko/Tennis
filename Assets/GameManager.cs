@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
                 Game();
                 break;
             case GameState.Clear:
-                Clear();
+                if(Input.GetKeyDown(KeyCode.Return)) GameInitialize();
                 break;
         }
         if(Input.GetKeyDown(KeyCode.Escape)){
@@ -119,9 +119,15 @@ public class GameManager : MonoBehaviour
     }
 
     // ゲームクリア時の処理
-    void Clear()
+    void GameClear()
     {
-
+        state = GameState.Clear;
+        GameObject.Find("SoundWin").GetComponent<AudioSource>().Play();
+        ball.GetComponent<Renderer>().enabled = false;
+        ball.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+        winnerMessage.enabled = true;
+        continueMessage.enabled = true;
+        btnMain.enabled = true;
     }
 
     // 初期化
@@ -155,6 +161,8 @@ public class GameManager : MonoBehaviour
         scoreA = 0;
         scoreB = 0;
         speed = 3.0f * (int)difficulty;
+        txtScoreA.text = scoreA.ToString();
+        txtScoreB.text = scoreB.ToString();
         ball.GetComponent<Rigidbody2D>().velocity = new Vector2(-speed, speed);
         GameObject.Find("Canvas").transform.Find("Opening").gameObject.SetActive(false);
         ball.GetComponent<Renderer>().enabled = true;
@@ -185,7 +193,7 @@ public class GameManager : MonoBehaviour
                 break;
             case "BtnMain":
                 if(state==GameState.Opening) GameInitialize();
-                if(state==GameState.Clear);
+                if(state==GameState.Clear) GameInitialize();
                 break;
         }
     }
@@ -199,8 +207,10 @@ public class GameManager : MonoBehaviour
     // ゴール後時間をおいてからゲームを再開する
     IEnumerator BallInit(string name)
     {
-        yield return new WaitForSeconds(2);
-        ball.transform.position = new Vector3(0, 4, 0);
+        yield return new WaitForSeconds(2);                 // 画面切り替えまで待つ
+        ball.transform.position = new Vector3(0, 4, 0);     // ボールを初期位置に
+
+        // 得点を設定する
        if(name == "GoalLeft")
         {
             ball.GetComponent<Rigidbody2D>().velocity = new Vector2(speed, speed);
@@ -215,17 +225,16 @@ public class GameManager : MonoBehaviour
         }
 
         // 先に100点を取った方が勝ち
-        /*if(scoreA >= 100)
+        if(scoreA >= 100)
         {
-            GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().text = "Player A Win!";
+            winnerMessage.text = "Player A Win!";
             GameClear();
         }
         else if(scoreB >= 100)
         {
-            GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().text = "Player B Win!";
+            winnerMessage.text = "Player B Win!";
             GameClear();
-
-        }*/
+        }
     }
 
 }
