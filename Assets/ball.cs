@@ -15,12 +15,13 @@ public class ball : MonoBehaviour
         GameInitialize();
     }
 
-    void GameInitialize(){
+    public void GameInitialize(){
         scoreA = 0;
         scoreB = 0;
         clear = false;
         GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().enabled = false;
         GameObject.Find("Message").GetComponent<UnityEngine.UI.Text>().enabled = false;
+        GameObject.Find("BtnMain").GetComponent<UnityEngine.UI.Button>().enabled = false;
         GameObject.Find("ScoreA").GetComponent<UnityEngine.UI.Text>().text = scoreA.ToString();
         GameObject.Find("ScoreB").GetComponent<UnityEngine.UI.Text>().text = scoreB.ToString();
         GetComponent<Renderer>().enabled = true;
@@ -47,6 +48,7 @@ public class ball : MonoBehaviour
         GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
         GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().enabled = true;
         GameObject.Find("Message").GetComponent<UnityEngine.UI.Text>().enabled = true;
+        GameObject.Find("BtnMain").GetComponent<UnityEngine.UI.Button>().enabled = true;
     }
 
     void OnCollisionEnter2D(Collision2D other)
