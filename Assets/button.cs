@@ -5,10 +5,13 @@ using UnityEngine;
 
 public class button : MonoBehaviour
 {
+
+    private GameManager manager;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        manager = GameObject.Find("Frame").GetComponent<GameManager>();
     }
 
     // Update is called once per frame
@@ -18,8 +21,10 @@ public class button : MonoBehaviour
     }
 
     public void Click(){
+
+        manager.InputUIButton(this.name);
         
-        GameObject barA = GameObject.Find("PlayerA");
+        /*GameObject barA = GameObject.Find("PlayerA");
         GameObject barB = GameObject.Find("PlayerB");
         ball cball = GameObject.Find("Ball").GetComponent<ball>();
         GameState state = cball.state;
@@ -65,7 +70,7 @@ public class button : MonoBehaviour
                 GameObject.Find("Opening").SetActive(false);
                 GameObject.Find("Ball").GetComponent<ball>().GameInitialize();
             }
-        }      
+        } */     
 
     }
 }

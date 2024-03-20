@@ -6,7 +6,7 @@ public class ball : MonoBehaviour
 {
     private int scoreA = 0;
     private int scoreB = 0;
-    public GameState state = GameState.Opening;
+    //public GameState state = GameState.Opening;
 
     private float speed = 0.3f;
     public float difficulty = 1.0f;
@@ -14,11 +14,11 @@ public class ball : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Opening();
+        //Opening();
     }
 
     public void Opening(){
-        state = GameState.Opening;
+        //state = GameState.Opening;
         GetComponent<Renderer>().enabled = false;
         GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().enabled = false;
         GameObject.Find("Message").GetComponent<UnityEngine.UI.Text>().enabled = false;
@@ -29,7 +29,7 @@ public class ball : MonoBehaviour
         scoreA = 0;
         scoreB = 0;
         speed = 0.3f * difficulty;
-        state = GameState.Game;
+        //state = GameState.Game;
         GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().enabled = false;
         GameObject.Find("Message").GetComponent<UnityEngine.UI.Text>().enabled = false;
         GameObject.Find("BtnMain").GetComponent<UnityEngine.UI.Button>().enabled = false;
@@ -42,6 +42,7 @@ public class ball : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        /*
         // ゲームクリア画面でエンターキーを押したら再プレイ
         if(state == GameState.Clear && Input.GetKey(KeyCode.Return)){
             GameInitialize();
@@ -66,10 +67,11 @@ public class ball : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Escape)){
             Application.Quit();
         }
+        */
     }
 
     void GameClear(){
-        state = GameState.Clear;
+        //state = GameState.Clear;
         GameObject.Find("SoundWin").GetComponent<AudioSource>().Play();
         GetComponent<Renderer>().enabled = false;
         GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
