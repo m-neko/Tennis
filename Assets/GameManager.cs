@@ -16,8 +16,12 @@ public class GameManager : MonoBehaviour
 {
     // オブジェクト
     private GameObject ball;
+    private GameObject playerA;
+    private GameObject playerB;
 
     // UI
+    private Text txtScoreA;
+    private Text txtScoreB;
     private Text winnerMessage;
     private Text continueMessage;
     private Button btnMain;
@@ -55,6 +59,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // オープニング画面の処理
     void Opening()
     {
         if(Input.GetKeyDown(KeyCode.UpArrow)) SelectDifficulty(KeyCode.UpArrow);
@@ -62,6 +67,7 @@ public class GameManager : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Return)) GameInitialize();
     }
 
+    // 難易度の選択
     void SelectDifficulty(KeyCode key)
     {
         switch(key){
@@ -80,24 +86,58 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // ゲーム中の処理
     void Game()
     {
-
+        if(Input.GetKeyDown(KeyCode.Q)) MovePlayer(KeyCode.Q);
+        if(Input.GetKeyDown(KeyCode.Z)) MovePlayer(KeyCode.Z);
+        if(Input.GetKeyDown(KeyCode.O)) MovePlayer(KeyCode.O);
+        if(Input.GetKeyDown(KeyCode.M)) MovePlayer(KeyCode.M);
     }
 
+    // ラケットの移動
+    void MovePlayer(KeyCode key)
+    {
+        switch(key){
+            case KeyCode.Q:
+                if(playerA.transform.position.y < 4.5f)
+                    playerA.transform.position += new Vector3(0, 1.0f, 0);
+                break;
+            case KeyCode.Z:
+                if(playerA.transform.position.y > -4.5f)
+                    playerA.transform.position += new Vector3(0, -1.0f, 0);
+                break;
+            case KeyCode.O:
+                if(playerB.transform.position.y < 4.5f)
+                    playerB.transform.position += new Vector3(0, 1.0f, 0);
+                break;
+            case KeyCode.M:
+                if(playerB.transform.position.y > -4.5f)
+                    playerB.transform.position += new Vector3(0, -1.0f, 0);
+                break;
+        }
+    }
+
+    // ゲームクリア時の処理
     void Clear()
     {
 
     }
 
+    // 初期化
     void Initialize()
     {
         ball = GameObject.Find("Ball");
+        playerA = GameObject.Find("PlayerA");
+        playerB = GameObject.Find("PlayerB");
+        txtScoreA = GameObject.Find("ScoreA").GetComponent<Text>();
+        txtScoreB = GameObject.Find("ScoreB").GetComponent<Text>();
         winnerMessage = GameObject.Find("Winner").GetComponent<Text>();
         continueMessage = GameObject.Find("Message").GetComponent<Text>();
         btnMain = GameObject.Find("BtnMain").GetComponent<Button>();
     }
 
+    // オープニング画面の初期化
     void OpeningInitialize()
     {
         state = GameState.Opening;
@@ -108,12 +148,14 @@ public class GameManager : MonoBehaviour
         btnMain.enabled = true;
     }
 
+    // ゲーム開始時の初期化
     void GameInitialize()
     {
         state = GameState.Game;
         scoreA = 0;
         scoreB = 0;
-        speed = 0.3f * (int)difficulty;
+        speed = 3.0f * (int)difficulty;
+        ball.GetComponent<Rigidbody2D>().velocity = new Vector2(-speed, speed);
         GameObject.Find("Canvas").transform.Find("Opening").gameObject.SetActive(false);
         ball.GetComponent<Renderer>().enabled = true;
         winnerMessage.enabled = false;
@@ -127,15 +169,19 @@ public class GameManager : MonoBehaviour
         switch(btnName){
             case "BtnUpA":
                 if(state==GameState.Opening) SelectDifficulty(KeyCode.UpArrow);
+                if(state==GameState.Game) MovePlayer(KeyCode.Q);
                 break;
             case "BtnDownA":
                 if(state==GameState.Opening) SelectDifficulty(KeyCode.DownArrow);
+                if(state==GameState.Game) MovePlayer(KeyCode.Z);
                 break;
             case "BtnUpB":
                 if(state==GameState.Opening) SelectDifficulty(KeyCode.UpArrow);
+                if(state==GameState.Game) MovePlayer(KeyCode.O);
                 break;
             case "BtnDownB":
                 if(state==GameState.Opening) SelectDifficulty(KeyCode.DownArrow);
+                if(state==GameState.Game) MovePlayer(KeyCode.M);
                 break;
             case "BtnMain":
                 if(state==GameState.Opening) GameInitialize();
@@ -143,4 +189,43 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
+
+    // ゴール処理
+    public void Goal(string name)
+    {
+        StartCoroutine(BallInit(name));
+    }
+
+    // ゴール後時間をおいてからゲームを再開する
+    IEnumerator BallInit(string name)
+    {
+        yield return new WaitForSeconds(2);
+        ball.transform.position = new Vector3(0, 4, 0);
+       if(name == "GoalLeft")
+        {
+            ball.GetComponent<Rigidbody2D>().velocity = new Vector2(speed, speed);
+            scoreB += 10;
+            txtScoreB.text = scoreB.ToString();
+        }
+        else if(name == "GoalRight")
+        {
+            ball.GetComponent<Rigidbody2D>().velocity = new Vector2(-speed, speed);
+            scoreA += 10;
+            txtScoreA.text = scoreA.ToString();
+        }
+
+        // 先に100点を取った方が勝ち
+        /*if(scoreA >= 100)
+        {
+            GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().text = "Player A Win!";
+            GameClear();
+        }
+        else if(scoreB >= 100)
+        {
+            GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().text = "Player B Win!";
+            GameClear();
+
+        }*/
+    }
+
 }

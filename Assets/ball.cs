@@ -4,21 +4,28 @@ using UnityEngine;
 
 public class ball : MonoBehaviour
 {
-    private int scoreA = 0;
-    private int scoreB = 0;
+
+    private GameManager manager;
+
+
+
+
+
+    //private int scoreA = 0;
+    //private int scoreB = 0;
     //public GameState state = GameState.Opening;
 
-    private float speed = 0.3f;
-    public float difficulty = 1.0f;
+    //private float speed = 0.3f;
+    //public float difficulty = 1.0f;
 
     // Start is called before the first frame update
     void Start()
     {
-        //Opening();
+        manager = GameObject.Find("Frame").GetComponent<GameManager>();
     }
 
-    public void Opening(){
-        //state = GameState.Opening;
+    /*public void Opening(){
+        state = GameState.Opening;
         GetComponent<Renderer>().enabled = false;
         GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().enabled = false;
         GameObject.Find("Message").GetComponent<UnityEngine.UI.Text>().enabled = false;
@@ -29,7 +36,7 @@ public class ball : MonoBehaviour
         scoreA = 0;
         scoreB = 0;
         speed = 0.3f * difficulty;
-        //state = GameState.Game;
+        state = GameState.Game;
         GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().enabled = false;
         GameObject.Find("Message").GetComponent<UnityEngine.UI.Text>().enabled = false;
         GameObject.Find("BtnMain").GetComponent<UnityEngine.UI.Button>().enabled = false;
@@ -37,7 +44,7 @@ public class ball : MonoBehaviour
         GameObject.Find("ScoreB").GetComponent<UnityEngine.UI.Text>().text = scoreB.ToString();
         GetComponent<Renderer>().enabled = true;
         GetComponent<Rigidbody2D>().velocity = new Vector2(-10*speed, 10*speed);
-    }
+    }*/
 
     // Update is called once per frame
     void Update()
@@ -70,15 +77,15 @@ public class ball : MonoBehaviour
         */
     }
 
-    void GameClear(){
-        //state = GameState.Clear;
+    /*void GameClear(){
+        state = GameState.Clear;
         GameObject.Find("SoundWin").GetComponent<AudioSource>().Play();
         GetComponent<Renderer>().enabled = false;
         GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
         GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().enabled = true;
         GameObject.Find("Message").GetComponent<UnityEngine.UI.Text>().enabled = true;
         GameObject.Find("BtnMain").GetComponent<UnityEngine.UI.Button>().enabled = true;
-    }
+    }*/
 
     void OnCollisionEnter2D(Collision2D other)
     {
@@ -92,12 +99,12 @@ public class ball : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        // ボールがゴールに入ったら初期位置に戻す
+        // ボールがゴールに入ったことをGameManagerに通知する
         GameObject.Find("SoundBeep").GetComponent<AudioSource>().Play();
-        StartCoroutine(BallInit(other.name));
+        manager.Goal(other.name);
     }
 
-    IEnumerator BallInit(string name)
+/*    IEnumerator BallInit(string name)
     {
         yield return new WaitForSeconds(2);
         transform.position = new Vector3(0, 4, 0);
@@ -126,6 +133,6 @@ public class ball : MonoBehaviour
             GameClear();
 
         }
-    }
+    }*/
 
 }
