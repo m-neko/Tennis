@@ -2,11 +2,6 @@ using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public enum GameState
-{
-    Opening, Game, Clear
-}
-
 public class ball : MonoBehaviour
 {
     private int scoreA = 0;
