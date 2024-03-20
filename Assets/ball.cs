@@ -1,24 +1,40 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+
+public enum GameState
+{
+    Opening, Game, Clear
+}
 
 public class ball : MonoBehaviour
 {
     private int scoreA = 0;
     private int scoreB = 0;
-    private bool clear = false;
+    public GameState state = GameState.Opening;
 
     private float speed = 0.3f;
+    public float difficulty = 1.0f;
 
     // Start is called before the first frame update
     void Start()
     {
-        GameInitialize();
+        Opening();
     }
 
-    public void GameInitialize(){
+    public void Opening(){
+        state = GameState.Opening;
+        GetComponent<Renderer>().enabled = false;
+        GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().enabled = false;
+        GameObject.Find("Message").GetComponent<UnityEngine.UI.Text>().enabled = false;
+        GameObject.Find("BtnMain").GetComponent<UnityEngine.UI.Button>().enabled = true;
+    }
+
+    public void GameInitialize(){ 
         scoreA = 0;
         scoreB = 0;
-        clear = false;
+        speed = 0.3f * difficulty;
+        state = GameState.Game;
         GameObject.Find("Winner").GetComponent<UnityEngine.UI.Text>().enabled = false;
         GameObject.Find("Message").GetComponent<UnityEngine.UI.Text>().enabled = false;
         GameObject.Find("BtnMain").GetComponent<UnityEngine.UI.Button>().enabled = false;
@@ -32,9 +48,25 @@ public class ball : MonoBehaviour
     void Update()
     {
         // ゲームクリア画面でエンターキーを押したら再プレイ
-        if(clear && Input.GetKey(KeyCode.Return)){
+        if(state == GameState.Clear && Input.GetKey(KeyCode.Return)){
             GameInitialize();
         }
+        // オープニング画面での難易度選択
+        if(state == GameState.Opening){
+            if(Input.GetKeyDown(KeyCode.UpArrow) && difficulty > 1.0f){
+                difficulty -= 1.0f;
+                GameObject.Find("Cursor").transform.position += new Vector3(0,1,0);
+            }
+            if(Input.GetKeyDown(KeyCode.DownArrow) && difficulty < 3.0f){
+                difficulty += 1.0f;
+                GameObject.Find("Cursor").transform.position += new Vector3(0,-1,0);
+            } 
+            if(Input.GetKeyDown(KeyCode.Return)){
+                GameObject.Find("Opening").SetActive(false);
+                GameInitialize();
+            }
+        }
+
         // ESCで終了
         if(Input.GetKeyDown(KeyCode.Escape)){
             Application.Quit();
@@ -42,7 +74,7 @@ public class ball : MonoBehaviour
     }
 
     void GameClear(){
-        clear = true;
+        state = GameState.Clear;
         GameObject.Find("SoundWin").GetComponent<AudioSource>().Play();
         GetComponent<Renderer>().enabled = false;
         GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
