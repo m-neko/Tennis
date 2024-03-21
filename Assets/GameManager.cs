@@ -14,6 +14,14 @@ enum GameDifficulty{
 
 public class GameManager : MonoBehaviour
 {
+    // 定数
+    private const float BALL_SPEED = 3.0f;
+    private const float BALL_RESET_TIME = 2.0f;
+    private const float PLAYER_UP_LIMIT = 4.5f;
+    private const float PLAYER_DOWN_LIMIT = -4.5f;
+    private const int SCORE_LIMIT = 100;
+    private const int ADD_SCORE = 10;
+
     // オブジェクト
     private GameObject ball;
     private GameObject playerA;
@@ -100,19 +108,19 @@ public class GameManager : MonoBehaviour
     {
         switch(key){
             case KeyCode.Q:
-                if(playerA.transform.position.y < 4.5f)
+                if(playerA.transform.position.y < PLAYER_UP_LIMIT)
                     playerA.transform.position += new Vector3(0, 1.0f, 0);
                 break;
             case KeyCode.Z:
-                if(playerA.transform.position.y > -4.5f)
+                if(playerA.transform.position.y > PLAYER_DOWN_LIMIT)
                     playerA.transform.position += new Vector3(0, -1.0f, 0);
                 break;
             case KeyCode.O:
-                if(playerB.transform.position.y < 4.5f)
+                if(playerB.transform.position.y < PLAYER_UP_LIMIT)
                     playerB.transform.position += new Vector3(0, 1.0f, 0);
                 break;
             case KeyCode.M:
-                if(playerB.transform.position.y > -4.5f)
+                if(playerB.transform.position.y > PLAYER_DOWN_LIMIT)
                     playerB.transform.position += new Vector3(0, -1.0f, 0);
                 break;
         }
@@ -124,7 +132,7 @@ public class GameManager : MonoBehaviour
         state = GameState.Clear;
         GameObject.Find("SoundWin").GetComponent<AudioSource>().Play();
         ball.GetComponent<Renderer>().enabled = false;
-        ball.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+        ball.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);  // ボールを止める
         winnerMessage.enabled = true;
         continueMessage.enabled = true;
         btnMain.enabled = true;
@@ -160,7 +168,7 @@ public class GameManager : MonoBehaviour
         state = GameState.Game;
         scoreA = 0;
         scoreB = 0;
-        speed = 3.0f * (int)difficulty;
+        speed = BALL_SPEED * (int)difficulty;
         txtScoreA.text = scoreA.ToString();
         txtScoreB.text = scoreB.ToString();
         ball.GetComponent<Rigidbody2D>().velocity = new Vector2(-speed, speed);
@@ -207,30 +215,31 @@ public class GameManager : MonoBehaviour
     // ゴール後時間をおいてからゲームを再開する
     IEnumerator BallInit(string name)
     {
-        yield return new WaitForSeconds(2);                 // 画面切り替えまで待つ
-        ball.transform.position = new Vector3(0, 4, 0);     // ボールを初期位置に
+        yield return new WaitForSeconds(BALL_RESET_TIME);         // 画面切り替えまで待つ
+        float ballPos = Random.Range(-4,4);                       
+        ball.transform.position = new Vector3(0, ballPos, 0);     // ボールを初期位置に
 
         // 得点を設定する
        if(name == "GoalLeft")
         {
             ball.GetComponent<Rigidbody2D>().velocity = new Vector2(speed, speed);
-            scoreB += 10;
+            scoreB += ADD_SCORE;
             txtScoreB.text = scoreB.ToString();
         }
         else if(name == "GoalRight")
         {
             ball.GetComponent<Rigidbody2D>().velocity = new Vector2(-speed, speed);
-            scoreA += 10;
+            scoreA += ADD_SCORE;
             txtScoreA.text = scoreA.ToString();
         }
 
         // 先に100点を取った方が勝ち
-        if(scoreA >= 100)
+        if(scoreA >= SCORE_LIMIT)
         {
             winnerMessage.text = "Player A Win!";
             GameClear();
         }
-        else if(scoreB >= 100)
+        else if(scoreB >= SCORE_LIMIT)
         {
             winnerMessage.text = "Player B Win!";
             GameClear();
