@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Advertisements;
 
 enum GameState
 {
@@ -12,7 +13,7 @@ enum GameDifficulty{
     Easy = 1, Normal = 2, Difficult = 3
 }
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IUnityAdsShowListener
 {
     // 定数
     private const float BALL_SPEED = 3.0f;
@@ -36,17 +37,62 @@ public class GameManager : MonoBehaviour
 
     // ゲーム管理情報
     private GameState state;
+    private bool AdsFlag = true;
     private int scoreA;
     private int scoreB;
     private float speed;
     private GameDifficulty difficulty;
+
+    // Ads
+    private const string ANDROID_KEY = "xxxxxx";
+    private const string IOS_KEY = "xxxxxx";
+    private const string ANDROID_INTERSTITIAL = "Interstitial_Android";
+    private const string IOS_INTERSTITIAL = "Interstitial_iOS";
+
+    /////////// Ads関係処理 ///////////
+    private void Awake()
+    {
+    #if UNITY_ANDROID
+        Advertisement.Initialize(ANDROID_KEY);
+        Advertisement.Load(ANDROID_INTERSTITIAL);
+    #elif UNITY_IOS
+        Advertisement.Initialize(IOS_KEY);
+        Advertisement.Load(IOS_INTERSTITIAL);
+    #endif
+    }
+
+    public void OnUnityAdsShowFailure(string _adUnitId, UnityAdsShowError error, string message) { }
+    public void OnUnityAdsShowClick(string _adUnitId) { }
+    
+    public void OnUnityAdsShowStart(string _adUnitId)
+    {
+        // Adsの表示が開始した時にゲームを中断
+        Time.timeScale = 0;
+    }
+    
+    public void OnUnityAdsShowComplete(string _adUnitId, UnityAdsShowCompletionState showCompletionState) 
+    {
+        // Adsの表示が終了した時にゲームを再開
+        Time.timeScale = 1;
+    }
+    /// ///////////////////////////////////
 
     // Start is called before the first frame update
     void Start()
     {
         Initialize();
         OpeningInitialize();
+        StartCoroutine(AdsShow());
     }
+
+    IEnumerator AdsShow()
+    {
+        GameObject.Find("Main Camera").GetComponent<Camera>().enabled = false;
+        yield return new WaitForSeconds(5);
+        GameObject.Find("Main Camera").GetComponent<Camera>().enabled = true;
+        AdsFlag = false;
+        Advertisement.Show(ANDROID_INTERSTITIAL,this);   // Adsの表示
+    }    
 
     // Update is called once per frame
     void Update()
@@ -70,9 +116,11 @@ public class GameManager : MonoBehaviour
     // オープニング画面の処理
     void Opening()
     {
-        if(Input.GetKeyDown(KeyCode.UpArrow)) SelectDifficulty(KeyCode.UpArrow);
-        if(Input.GetKeyDown(KeyCode.DownArrow)) SelectDifficulty(KeyCode.DownArrow);
-        if(Input.GetKeyDown(KeyCode.Return)) GameInitialize();
+        if(!AdsFlag){
+            if(Input.GetKeyDown(KeyCode.UpArrow)) SelectDifficulty(KeyCode.UpArrow);
+            if(Input.GetKeyDown(KeyCode.DownArrow)) SelectDifficulty(KeyCode.DownArrow);
+            if(Input.GetKeyDown(KeyCode.Return)) GameInitialize();
+        }
     }
 
     // 難易度の選択
@@ -176,33 +224,35 @@ public class GameManager : MonoBehaviour
         ball.GetComponent<Renderer>().enabled = true;
         winnerMessage.enabled = false;
         continueMessage.enabled = false;
-        btnMain.enabled = false;
+        btnMain.enabled = false;  
     }
 
     // UIボタン処理(入力があるとボタン側から呼び出される)
     public void InputUIButton(string btnName)
     {
-        switch(btnName){
-            case "BtnUpA":
-                if(state==GameState.Opening) SelectDifficulty(KeyCode.UpArrow);
-                if(state==GameState.Game) MovePlayer(KeyCode.Q);
-                break;
-            case "BtnDownA":
-                if(state==GameState.Opening) SelectDifficulty(KeyCode.DownArrow);
-                if(state==GameState.Game) MovePlayer(KeyCode.Z);
-                break;
-            case "BtnUpB":
-                if(state==GameState.Opening) SelectDifficulty(KeyCode.UpArrow);
-                if(state==GameState.Game) MovePlayer(KeyCode.O);
-                break;
-            case "BtnDownB":
-                if(state==GameState.Opening) SelectDifficulty(KeyCode.DownArrow);
-                if(state==GameState.Game) MovePlayer(KeyCode.M);
-                break;
-            case "BtnMain":
-                if(state==GameState.Opening) GameInitialize();
-                if(state==GameState.Clear) GameInitialize();
-                break;
+        if(!AdsFlag){
+            switch(btnName){
+                case "BtnUpA":
+                    if(state==GameState.Opening) SelectDifficulty(KeyCode.UpArrow);
+                    if(state==GameState.Game) MovePlayer(KeyCode.Q);
+                    break;
+                case "BtnDownA":
+                    if(state==GameState.Opening) SelectDifficulty(KeyCode.DownArrow);
+                    if(state==GameState.Game) MovePlayer(KeyCode.Z);
+                    break;
+                case "BtnUpB":
+                    if(state==GameState.Opening) SelectDifficulty(KeyCode.UpArrow);
+                    if(state==GameState.Game) MovePlayer(KeyCode.O);
+                    break;
+                case "BtnDownB":
+                    if(state==GameState.Opening) SelectDifficulty(KeyCode.DownArrow);
+                    if(state==GameState.Game) MovePlayer(KeyCode.M);
+                    break;
+                case "BtnMain":
+                    if(state==GameState.Opening) GameInitialize();
+                    if(state==GameState.Clear) GameInitialize();
+                    break;
+            }
         }
     }
 
